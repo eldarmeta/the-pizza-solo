@@ -2,15 +2,17 @@ package com.pizza.ui;
 
 import com.pizza.model.Pizza;
 import com.pizza.model.Topping;
+import com.pizza.model.Order;
 
 import java.util.Scanner;
 
 public class Menu {
     private Scanner scanner = new Scanner(System.in);
+    private Order order = new Order();
     private Pizza pizza;
 
-    public  void run() {
-        System.out.println("*** Welcome to the Pizza App ***");
+    public void run() {
+        System.out.println("=== Welcome to The Pizza App ===");
 
         while (true) {
             printMenu();
@@ -21,10 +23,8 @@ public class Menu {
                 case 2 -> addTopping();
                 case 3 -> removeTopping();
                 case 4 -> showPizza();
-                case 5 -> {
-                    completeOrder();
-                    return;
-                }
+                case 5 -> savePizzaToOrder();
+                case 6 -> showOrder();
                 case 0 -> {
                     System.out.println("Exiting...");
                     return;
@@ -33,36 +33,40 @@ public class Menu {
             }
         }
     }
+
     private void printMenu() {
         System.out.println("\n1. Create new pizza");
-        System.out.println("2. Add topping");
-        System.out.println("3. Remove topping");
+        System.out.println("2. Add topping to current pizza");
+        System.out.println("3. Remove topping from current pizza");
         System.out.println("4. Show current pizza");
-        System.out.println("5. Complete order");
+        System.out.println("5. Save pizza to order");
+        System.out.println("6. Show full order");
         System.out.println("0. Exit");
-        System.out.println("Choose an option: ");
+        System.out.print("Choose an option: ");
     }
+
     private int getChoice() {
         try {
             return Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e){
-            return  -1;
+        } catch (NumberFormatException e) {
+            return -1;
         }
     }
+
     private void createPizza() {
         System.out.print("Enter pizza size (Small/Medium/Large): ");
         String size = scanner.nextLine();
         pizza = new Pizza(size);
         System.out.println("Created a new pizza of size: " + size);
     }
-    private  void  addTopping() {
+
+    private void addTopping() {
         if (pizza == null) {
             System.out.println("Please create a pizza first.");
             return;
         }
         System.out.print("Enter topping name: ");
         String name = scanner.nextLine();
-
         System.out.print("Enter topping price: ");
         double price = Double.parseDouble(scanner.nextLine());
         pizza.addTopping(new Topping(name, price));
@@ -70,7 +74,7 @@ public class Menu {
     }
 
     private void removeTopping() {
-        if (pizza == null || pizza.getToppings().isEmpty()){
+        if (pizza == null || pizza.getToppings().isEmpty()) {
             System.out.println("No pizza or toppings found.");
             return;
         }
@@ -87,11 +91,22 @@ public class Menu {
             pizza.printInfo();
         }
     }
-    private  void completeOrder() {
-        if (pizza != null) {
-            System.out.println("Your final order:");
-            pizza.printInfo();
+
+    private void savePizzaToOrder() {
+        if (pizza == null) {
+            System.out.println("No pizza to save.");
+        } else {
+            order.addPizza(pizza);
+            System.out.println("Pizza added to order.");
+            pizza = null;
         }
-        System.out.println("Thank you for  ordering!");
+    }
+
+    private void showOrder() {
+        if (order.getPizzas().isEmpty()) {
+            System.out.println("No pizzas in order.");
+        } else {
+            order.printReceipt();
+        }
     }
 }
