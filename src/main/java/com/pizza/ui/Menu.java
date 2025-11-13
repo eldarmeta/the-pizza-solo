@@ -1,8 +1,10 @@
 package com.pizza.ui;
 
+import com.pizza.model.Order;
 import com.pizza.model.Pizza;
 import com.pizza.model.Topping;
-import com.pizza.model.Order;
+import com.pizza.io.OrderPrinter;
+import com.pizza.io.OrderFileWriter;
 
 import java.util.Scanner;
 
@@ -10,6 +12,8 @@ public class Menu {
     private Scanner scanner = new Scanner(System.in);
     private Order order = new Order();
     private Pizza pizza;
+    private OrderPrinter printer = new OrderPrinter();
+    private OrderFileWriter fileWriter = new OrderFileWriter();
 
     public void run() {
         System.out.println("=== Welcome to The Pizza App ===");
@@ -25,6 +29,7 @@ public class Menu {
                 case 4 -> showPizza();
                 case 5 -> savePizzaToOrder();
                 case 6 -> showOrder();
+                case 7 -> saveOrderToFile();
                 case 0 -> {
                     System.out.println("Exiting...");
                     return;
@@ -41,6 +46,7 @@ public class Menu {
         System.out.println("4. Show current pizza");
         System.out.println("5. Save pizza to order");
         System.out.println("6. Show full order");
+        System.out.println("7. Save order to file");
         System.out.println("0. Exit");
         System.out.print("Choose an option: ");
     }
@@ -106,7 +112,17 @@ public class Menu {
         if (order.getPizzas().isEmpty()) {
             System.out.println("No pizzas in order.");
         } else {
-            order.printReceipt();
+            printer.printToConsole(order);
+        }
+    }
+
+    private void saveOrderToFile() {
+        if (order.getPizzas().isEmpty()) {
+            System.out.println("No pizzas to save.");
+        } else {
+            System.out.print("Enter filename to save order (e.g. receipt.txt): ");
+            String filename = scanner.nextLine();
+            fileWriter.writeToFile(order, filename);
         }
     }
 }
