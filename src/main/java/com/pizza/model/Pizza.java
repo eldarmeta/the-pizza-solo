@@ -4,67 +4,54 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Pizza {
-    private String size;
-    private double basePrice;
-    private List<Topping> toppings;
 
-    public  Pizza(String size) {
+    private String size; // Small / Medium / Large
+    private List<Topping> toppings = new ArrayList<>();
+
+    public Pizza(String size) {
         this.size = size;
-        this.toppings = new ArrayList<>();
-        setBasePriceBySize(size);
     }
 
-    private void setBasePriceBySize(String size) {
-        switch (size.toLowerCase()) {
-            case "small":
-                this.basePrice = 8.00;
-                break;
-            case "medium":
-                this.basePrice = 10.00;
-                break;
-            case  "large":
-                this.basePrice = 12.00;
-                break;
-            default:
-                this.basePrice = 10.00;
-                System.out.println("Unknown size, defaulting to medium.");
-        }
-    }
-
-    public void addTopping(Topping topping) {
-        toppings.add(topping);
-    }
-
-    public  void removeTopping(Topping topping) {
-        toppings.remove(topping);
-    }
-
-    public double calculatePrice() {
-        double total = basePrice;
-        for (Topping topping : toppings) {
-            total += topping.getPrice();
-        }
-        return total;
-    }
-
-    public void  printInfo() {
-        System.out.println("Pizza size: " + size);
-        System.out.println("Toppings: ");
-        for (Topping topping : toppings) {
-            System.out.println("- " + topping);
-        }
-        System.out.println("Total price: $" + String.format("%.2f", calculatePrice()));
-    }
-
-    public String getSize(){
+    // Getters
+    public String getSize() {
         return size;
-    }
-
-    public  double getBasePrice() {
-        return basePrice;
     }
 
     public List<Topping> getToppings() {
         return toppings;
+    }
+
+    // Setters
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    // Business Logic
+    public void addTopping(Topping topping) {
+        toppings.add(topping);
+    }
+
+    public boolean removeTopping(String toppingName) {
+        return toppings.removeIf(t -> t.getName().equalsIgnoreCase(toppingName));
+    }
+
+    public double calculatePrice() {
+        double basePrice = switch (size.toLowerCase()) {
+            case "small" -> 8.00;
+            case "medium" -> 10.00;
+            case "large" -> 12.00;
+            default -> 10.00; // fallback
+        };
+
+        double toppingsTotal = toppings.stream()
+                .mapToDouble(Topping::getPrice)
+                .sum();
+
+        return basePrice + toppingsTotal;
+    }
+
+    @Override
+    public String toString() {
+        return "Pizza (" + size + ") with " + toppings.size() + " toppings";
     }
 }
