@@ -34,15 +34,15 @@ public class OrderService {
     }
 
     public double getSubtotal() {
-        return getCurrentOrder().getTotal();
+        return currentOrder.getTotal();
     }
 
     public double getTax() {
         return getSubtotal() * 0.07;
     }
 
-    public double getTotalWithTaxAndTip(double tip) {
-        return getSubtotal() + getTax() + tip;
+    public double getFinalTotal() {
+        return getSubtotal() + getTax() + currentOrder.getTip();
     }
 
     public boolean hasItems() {

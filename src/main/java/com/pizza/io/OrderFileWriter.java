@@ -17,6 +17,7 @@ public class OrderFileWriter implements ReceiptWriter {
 
     @Override
     public void write(Order order) {
+
         String timestamp = DateUtil.formatForFile(order.getCreatedAt());
 
         File receiptsDir = new File("receipts");
@@ -25,12 +26,10 @@ public class OrderFileWriter implements ReceiptWriter {
         }
 
         File file = new File(receiptsDir, timestamp + ".txt");
-        PrintWriter writer = null;
 
-        try {
-            writer = new PrintWriter(new FileWriter(file));
+        try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
 
-            writer.println("#$#$# Order Receipt #$#$#");
+            writer.println("***** ORDER RECEIPT *****");
             writer.println("Order ID: " + order.getOrderId());
             writer.println("Created at: " + DateUtil.formatForDisplay(order.getCreatedAt()));
             writer.println();
@@ -64,17 +63,22 @@ public class OrderFileWriter implements ReceiptWriter {
                 writer.println();
             }
 
-            writer.println("TOTAL ORDER: " + PriceFormatter.format(order.getTotal()));
-            writer.println("Thank you for ordering!");
+            double subtotal = order.getTotal();
+            double tax = subtotal * 0.07;
+            double tip = order.getTip();
+            double finalTotal = subtotal + tax + tip;
 
-            System.out.println("Order successfully saved to file: " + file.getPath());
+            writer.println("Subtotal: " + PriceFormatter.format(subtotal));
+            writer.println("Tax (7%): " + PriceFormatter.format(tax));
+            writer.println("Tip: " + PriceFormatter.format(tip));
+            writer.println("------------------------------");
+            writer.println("FINAL TOTAL: " + PriceFormatter.format(finalTotal));
+            writer.println("------------------------------");
+
+            System.out.println("Order saved to file: " + file.getPath());
 
         } catch (IOException e) {
             System.out.println("Error saving order: " + e.getMessage());
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
         }
     }
 }

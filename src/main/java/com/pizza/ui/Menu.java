@@ -302,7 +302,9 @@ public class Menu {
             }
         }
 
-        double finalTotal = orderService.getTotalWithTaxAndTip(tip);
+        orderService.getCurrentOrder().setTip(tip);
+
+        double finalTotal = orderService.getFinalTotal();
 
         System.out.println("Tip: $" + String.format("%.2f", tip));
         System.out.println("FINAL TOTAL: $" + String.format("%.2f", finalTotal));

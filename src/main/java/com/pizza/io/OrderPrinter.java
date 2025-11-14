@@ -12,7 +12,7 @@ public class OrderPrinter implements ReceiptWriter {
 
     @Override
     public void write(Order order) {
-        System.out.println("***** Order Receipt *****");
+        System.out.println("***** ORDER RECEIPT *****");
         System.out.println("Order ID: " + order.getOrderId());
         System.out.println("Created at: " + DateUtil.formatForDisplay(order.getCreatedAt()));
         System.out.println();
@@ -46,7 +46,16 @@ public class OrderPrinter implements ReceiptWriter {
             System.out.println();
         }
 
-        System.out.println("TOTAL ORDER: " + PriceFormatter.format(order.getTotal()));
-        System.out.println("Thank you for ordering!");
+        double subtotal = order.getTotal();
+        double tax = subtotal * 0.07;
+        double tip = order.getTip();
+        double finalTotal = subtotal + tax + tip;
+
+        System.out.println("Subtotal: " + PriceFormatter.format(subtotal));
+        System.out.println("Tax (7%): " + PriceFormatter.format(tax));
+        System.out.println("Tip: " + PriceFormatter.format(tip));
+        System.out.println("------------------------------");
+        System.out.println("FINAL TOTAL: " + PriceFormatter.format(finalTotal));
+        System.out.println("------------------------------");
     }
 }

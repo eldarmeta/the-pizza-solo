@@ -67,4 +67,15 @@ public class Order {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+    private double tip = 0.0;
+
+    public void setTip(double tip) {
+        this.tip = tip;
+    }
+
+    public double getTip() {
+        return tip;
+    }
+
+
 }
