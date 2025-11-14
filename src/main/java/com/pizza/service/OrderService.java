@@ -33,8 +33,18 @@ public class OrderService {
         currentOrder.addSideItem(sideItem);
     }
 
-    public double getTotal() {
-        return currentOrder.getTotal();
+    public double getSubtotal() {
+        // предполагаем, что Order сам считает total на основе пицц/напитков/сайдов
+        return getCurrentOrder().getTotal();
+    }
+
+    public double getTax() {
+        // 7% sales tax
+        return getSubtotal() * 0.07;
+    }
+
+    public double getTotalWithTaxAndTip(double tip) {
+        return getSubtotal() + getTax() + tip;
     }
 
     public boolean hasItems() {
