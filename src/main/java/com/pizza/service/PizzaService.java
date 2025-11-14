@@ -2,6 +2,9 @@ package com.pizza.service;
 
 import com.pizza.model.Pizza;
 import com.pizza.model.Topping;
+import com.pizza.model.signature.MargheritaPizza;
+import com.pizza.model.signature.PepperoniSignaturePizza;
+import com.pizza.model.signature.VeggiePizza;
 
 public class PizzaService {
 
@@ -17,7 +20,13 @@ public class PizzaService {
         return pizza.removeTopping(toppingName);
     }
 
-    public double calculatePrice(Pizza pizza) {
-        return pizza.calculatePrice();
+    public Pizza createSignaturePizza(int option, String size) {
+        return switch (option) {
+            case 1 -> new MargheritaPizza(size);
+            case 2 -> new PepperoniSignaturePizza(size);
+            case 3 -> new VeggiePizza(size);
+            default -> null;
+        };
     }
+
 }
