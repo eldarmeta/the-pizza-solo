@@ -5,18 +5,19 @@ import com.pizza.model.Pizza;
 import com.pizza.model.Topping;
 import com.pizza.model.Drink;
 import com.pizza.model.SideItem;
+import com.pizza.util.DateUtil;
+import com.pizza.util.PriceFormatter;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
+import java.io.PrintWriter;
 
-public class OrderFileWriter {
+public class OrderFileWriter implements ReceiptWriter {
 
-    public void writeToFile(Order order) {
-        DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
-        String timestamp = order.getCreatedAt().format(fileFormatter);
+    @Override
+    public void write(Order order) {
+        String timestamp = DateUtil.formatForFile(order.getCreatedAt());
 
         File receiptsDir = new File("receipts");
         if (!receiptsDir.exists()) {
@@ -24,18 +25,14 @@ public class OrderFileWriter {
         }
 
         File file = new File(receiptsDir, timestamp + ".txt");
-
         PrintWriter writer = null;
 
         try {
-            FileWriter fileWriter = new FileWriter(file);
-            writer = new PrintWriter(fileWriter);
-
-            DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            writer = new PrintWriter(new FileWriter(file));
 
             writer.println("=== Order Receipt ===");
             writer.println("Order ID: " + order.getOrderId());
-            writer.println("Created at: " + order.getCreatedAt().format(displayFormatter));
+            writer.println("Created at: " + DateUtil.formatForDisplay(order.getCreatedAt()));
             writer.println();
 
             int pizzaNumber = 1;
@@ -44,9 +41,9 @@ public class OrderFileWriter {
                 writer.println("Size: " + pizza.getSize());
                 writer.println("Toppings:");
                 for (Topping topping : pizza.getToppings()) {
-                    writer.println("- " + topping.getName() + " ($" + String.format("%.2f", topping.getPrice()) + ")");
+                    writer.println("- " + topping.getName() + " (" + PriceFormatter.format(topping.getPrice()) + ")");
                 }
-                writer.println("Pizza Total: $" + String.format("%.2f", pizza.calculatePrice()));
+                writer.println("Pizza Total: " + PriceFormatter.format(pizza.calculatePrice()));
                 writer.println();
                 pizzaNumber++;
             }
@@ -54,7 +51,7 @@ public class OrderFileWriter {
             if (!order.getDrinks().isEmpty()) {
                 writer.println("Drinks:");
                 for (Drink drink : order.getDrinks()) {
-                    writer.println("- " + drink.getName() + " ($" + String.format("%.2f", drink.getPrice()) + ")");
+                    writer.println("- " + drink.getName() + " (" + PriceFormatter.format(drink.getPrice()) + ")");
                 }
                 writer.println();
             }
@@ -62,13 +59,14 @@ public class OrderFileWriter {
             if (!order.getSides().isEmpty()) {
                 writer.println("Sides:");
                 for (SideItem sideItem : order.getSides()) {
-                    writer.println("- " + sideItem.getName() + " ($" + String.format("%.2f", sideItem.getPrice()) + ")");
+                    writer.println("- " + sideItem.getName() + " (" + PriceFormatter.format(sideItem.getPrice()) + ")");
                 }
                 writer.println();
             }
 
-            writer.println("TOTAL ORDER: $" + String.format("%.2f", order.getTotal()));
+            writer.println("TOTAL ORDER: " + PriceFormatter.format(order.getTotal()));
             writer.println("Thank you for ordering!");
+
             System.out.println("Order successfully saved to file: " + file.getPath());
 
         } catch (IOException e) {
