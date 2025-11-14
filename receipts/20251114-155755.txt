@@ -1,0 +1,15 @@
+***** ORDER RECEIPT *****
+Order ID: ORD-20251114-155755
+Created at: 2025-11-14 15:57:55
+
+Pizza 1:
+Size: Large
+Toppings:
+Pizza Total: $12.00
+
+Subtotal: $12.00
+Tax (7%): $0.84
+Tip: $1000.00
+------------------------------
+FINAL TOTAL: $1012.84
+------------------------------

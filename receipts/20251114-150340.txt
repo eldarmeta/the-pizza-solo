@@ -1,0 +1,14 @@
+#$#$# Order Receipt #$#$#
+Order ID: ORD-20251114-150340
+Created at: 2025-11-14 15:03:40
+
+Pizza 1:
+Size: Large
+Toppings:
+- Mushrooms ($0.75)
+- Onions ($0.50)
+- Olives ($0.80)
+Pizza Total: $14.05
+
+TOTAL ORDER: $14.05
+Thank you for ordering!
