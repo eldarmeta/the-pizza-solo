@@ -19,7 +19,7 @@ public class InputValidator {
             return Size.LARGE;
         }
 
-        return null; // invalid
+        return null;
     }
 
     public static int parseIntOrMinusOne(String input) {
@@ -31,9 +31,5 @@ public class InputValidator {
         } catch (NumberFormatException e) {
             return -1;
         }
-    }
-
-    public static boolean isInRange(int value, int min, int max) {
-        return value >= min && value <= max;
     }
 }

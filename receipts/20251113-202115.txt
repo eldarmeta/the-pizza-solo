@@ -1,0 +1,21 @@
+=== Order Receipt ===
+Order ID: ORD-20251113-202115
+Created at: 2025-11-13 20:21:15
+
+Pizza 1:
+Size: Small
+Toppings:
+- Cheese ($1.00)
+- Sausage ($1.75)
+- Onions ($0.50)
+Pizza Total: $11.25
+
+Drinks:
+- Coke ($1.50)
+
+Sides:
+- Garlic Knots ($3.50)
+- Chicken Wings ($6.00)
+
+TOTAL ORDER: $22.25
+Thank you for ordering!

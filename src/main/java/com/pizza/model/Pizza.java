@@ -5,14 +5,13 @@ import java.util.List;
 
 public class Pizza {
 
-    private String size; // Small / Medium / Large
+    private String size;
     private List<Topping> toppings = new ArrayList<>();
 
     public Pizza(String size) {
         this.size = size;
     }
 
-    // Getters
     public String getSize() {
         return size;
     }
@@ -21,12 +20,10 @@ public class Pizza {
         return toppings;
     }
 
-    // Setters
     public void setSize(String size) {
         this.size = size;
     }
 
-    // Business Logic
     public void addTopping(Topping topping) {
         toppings.add(topping);
     }
@@ -47,7 +44,7 @@ public class Pizza {
             case "small" -> 8.00;
             case "medium" -> 10.00;
             case "large" -> 12.00;
-            default -> 10.00; // fallback
+            default -> 10.00;
         };
 
         double toppingsTotal = toppings.stream()

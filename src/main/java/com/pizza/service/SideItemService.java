@@ -21,10 +21,6 @@ public class SideItemService {
         availableSides.add(new SideItem("Salad", 3.00));
     }
 
-    public List<SideItem> getAvailableSides() {
-        return availableSides;
-    }
-
     public SideItem getSideByIndex(int index) {
         if (index < 0 || index >= availableSides.size()) {
             return null;

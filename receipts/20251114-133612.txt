@@ -1,0 +1,30 @@
+#$#$# Order Receipt #$#$#
+Order ID: ORD-20251114-133612
+Created at: 2025-11-14 13:36:12
+
+Pizza 1:
+Size: Large
+Toppings:
+- Cheese ($1.00)
+- Pepperoni ($1.50)
+- Sausage ($1.75)
+- Mushrooms ($0.75)
+- Olives ($0.80)
+Pizza Total: $17.80
+
+Pizza 2:
+Size: Large
+Toppings:
+- Mushrooms ($0.75)
+- Onions ($0.50)
+- Olives ($0.80)
+Pizza Total: $14.05
+
+Drinks:
+- Iced Tea ($2.00)
+
+Sides:
+- Garlic Knots ($3.50)
+
+TOTAL ORDER: $37.35
+Thank you for ordering!

@@ -12,7 +12,7 @@ public class OrderPrinter implements ReceiptWriter {
 
     @Override
     public void write(Order order) {
-        System.out.println("=== Order Receipt ===");
+        System.out.println("***** Order Receipt *****");
         System.out.println("Order ID: " + order.getOrderId());
         System.out.println("Created at: " + DateUtil.formatForDisplay(order.getCreatedAt()));
         System.out.println();

@@ -1,0 +1,31 @@
+=== Order Receipt ===
+Order ID: ORD-20251114-130349
+Created at: 2025-11-14 13:03:49
+
+Pizza 1:
+Size: Medium
+Toppings:
+- Pepperoni ($1.50)
+- Sausage ($1.75)
+- Mushrooms ($0.75)
+- Onions ($0.50)
+- Olives ($0.80)
+Pizza Total: $15.30
+
+Pizza 2:
+Size: Large
+Toppings:
+- Cheese ($1.00)
+- Tomato Sauce ($0.75)
+- Pepperoni ($1.50)
+Pizza Total: $15.25
+
+Drinks:
+- Sprite ($1.50)
+
+Sides:
+- Chicken Wings ($6.00)
+- Salad ($3.00)
+
+TOTAL ORDER: $41.05
+Thank you for ordering!

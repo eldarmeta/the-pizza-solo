@@ -41,12 +41,12 @@ public class Menu {
 
             switch (choice) {
                 case 1 -> createNewPizza();
-                case 2 -> createSignaturePizza();   // ✨ NEW
+                case 2 -> createSignaturePizza();
                 case 3 -> addDrink();
                 case 4 -> addSideItem();
                 case 5 -> showCurrentOrder();
                 case 6 -> saveOrderToFile();
-                case 7 -> finalizeOrderAndStartNew(); // сдвинулся на 7
+                case 7 -> finalizeOrderAndStartNew();
                 case 0 -> {
                     System.out.println("Exiting application. Goodbye!");
                     running = false;
@@ -58,7 +58,7 @@ public class Menu {
 
     private void printMainMenu() {
         System.out.println();
-        System.out.println("=== PIZZA ORDERING SYSTEM ===");
+        System.out.println("^^^^ PIZZA ORDERING SYSTEM ^^^^^");
         System.out.println("1. Create / Edit Pizza");
         System.out.println("2. Create Signature Pizza");
         System.out.println("3. Add Drink");
@@ -72,7 +72,7 @@ public class Menu {
 
     private void createNewPizza() {
         System.out.println();
-        System.out.println("=== CREATE / EDIT PIZZA ===");
+        System.out.println("^^^^^^ CREATE / EDIT PIZZA ^^^^^^^");
 
         String size;
         while (true) {
@@ -120,10 +120,9 @@ public class Menu {
         }
     }
 
-    // ✨ NEW: Signature pizzas (использует PizzaService.createSignaturePizza)
     private void createSignaturePizza() {
         System.out.println();
-        System.out.println("=== SIGNATURE PIZZAS ===");
+        System.out.println("### SIGNATURE PIZZAS ###");
         System.out.println("1. Margherita");
         System.out.println("2. Pepperoni");
         System.out.println("3. Veggie");
@@ -285,7 +284,6 @@ public class Menu {
         System.out.println("Final order:");
         consoleWriter.write(orderService.getCurrentOrder());
 
-        // ✨ NEW: tax + tip summary
         double subtotal = orderService.getSubtotal();
         double tax = orderService.getTax();
 

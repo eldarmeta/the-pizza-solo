@@ -21,10 +21,6 @@ public class DrinkService {
         availableDrinks.add(new Drink("Iced Tea", 2.00));
     }
 
-    public List<Drink> getAvailableDrinks() {
-        return availableDrinks;
-    }
-
     public Drink getDrinkByIndex(int index) {
         if (index < 0 || index >= availableDrinks.size()) {
             return null;

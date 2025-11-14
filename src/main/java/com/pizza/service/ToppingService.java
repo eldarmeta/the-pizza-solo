@@ -22,10 +22,6 @@ public class ToppingService {
         availableToppings.add(new Topping("Olives", 0.80));
     }
 
-    public List<Topping> getAvailableToppings() {
-        return availableToppings;
-    }
-
     public Topping getToppingByIndex(int index) {
         if (index < 0 || index >= availableToppings.size()) {
             return null;

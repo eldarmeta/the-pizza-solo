@@ -34,12 +34,10 @@ public class OrderService {
     }
 
     public double getSubtotal() {
-        // предполагаем, что Order сам считает total на основе пицц/напитков/сайдов
         return getCurrentOrder().getTotal();
     }
 
     public double getTax() {
-        // 7% sales tax
         return getSubtotal() * 0.07;
     }
 

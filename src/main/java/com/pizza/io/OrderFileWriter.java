@@ -30,7 +30,7 @@ public class OrderFileWriter implements ReceiptWriter {
         try {
             writer = new PrintWriter(new FileWriter(file));
 
-            writer.println("=== Order Receipt ===");
+            writer.println("#$#$# Order Receipt #$#$#");
             writer.println("Order ID: " + order.getOrderId());
             writer.println("Created at: " + DateUtil.formatForDisplay(order.getCreatedAt()));
             writer.println();
