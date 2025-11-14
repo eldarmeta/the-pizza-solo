@@ -41,11 +41,12 @@ public class Menu {
 
             switch (choice) {
                 case 1 -> createNewPizza();
-                case 2 -> addDrink();
-                case 3 -> addSideItem();
-                case 4 -> showCurrentOrder();
-                case 5 -> saveOrderToFile();
-                case 6 -> finalizeOrderAndStartNew();
+                case 2 -> createSignaturePizza();   // ✨ NEW
+                case 3 -> addDrink();
+                case 4 -> addSideItem();
+                case 5 -> showCurrentOrder();
+                case 6 -> saveOrderToFile();
+                case 7 -> finalizeOrderAndStartNew(); // сдвинулся на 7
                 case 0 -> {
                     System.out.println("Exiting application. Goodbye!");
                     running = false;
@@ -59,11 +60,12 @@ public class Menu {
         System.out.println();
         System.out.println("=== PIZZA ORDERING SYSTEM ===");
         System.out.println("1. Create / Edit Pizza");
-        System.out.println("2. Add Drink");
-        System.out.println("3. Add Side Item");
-        System.out.println("4. Show Current Order");
-        System.out.println("5. Save Order to File");
-        System.out.println("6. Finalize Order and Start New");
+        System.out.println("2. Create Signature Pizza");
+        System.out.println("3. Add Drink");
+        System.out.println("4. Add Side Item");
+        System.out.println("5. Show Current Order");
+        System.out.println("6. Save Order to File");
+        System.out.println("7. Finalize Order and Start New");
         System.out.println("0. Exit");
         System.out.print("Choose an option: ");
     }
@@ -116,6 +118,43 @@ public class Menu {
                 default -> System.out.println("Invalid option. Please try again.");
             }
         }
+    }
+
+    // ✨ NEW: Signature pizzas (использует PizzaService.createSignaturePizza)
+    private void createSignaturePizza() {
+        System.out.println();
+        System.out.println("=== SIGNATURE PIZZAS ===");
+        System.out.println("1. Margherita");
+        System.out.println("2. Pepperoni");
+        System.out.println("3. Veggie");
+        System.out.print("Choose a signature pizza (or 0 to cancel): ");
+
+        String input = scanner.nextLine();
+        int choice = InputValidator.parseIntOrMinusOne(input);
+
+        if (choice == 0) {
+            System.out.println("Cancelled.");
+            return;
+        }
+
+        System.out.print("Enter size (Small/Medium/Large or S/M/L): ");
+        String sizeInput = scanner.nextLine();
+        String size = InputValidator.normalizeSize(sizeInput);
+
+        if (size == null) {
+            System.out.println("Invalid size.");
+            return;
+        }
+
+        Pizza pizza = pizzaService.createSignaturePizza(choice, size);
+
+        if (pizza == null) {
+            System.out.println("Invalid signature pizza option.");
+            return;
+        }
+
+        orderService.addPizza(pizza);
+        System.out.println("Signature pizza added to order!");
     }
 
     private void addToppingToCurrentPizza() {
@@ -245,6 +284,30 @@ public class Menu {
 
         System.out.println("Final order:");
         consoleWriter.write(orderService.getCurrentOrder());
+
+        // ✨ NEW: tax + tip summary
+        double subtotal = orderService.getSubtotal();
+        double tax = orderService.getTax();
+
+        System.out.println("Subtotal: $" + String.format("%.2f", subtotal));
+        System.out.println("Tax (7%): $" + String.format("%.2f", tax));
+
+        System.out.print("Enter tip amount (leave empty for 0): ");
+        String tipInput = scanner.nextLine().trim();
+        double tip = 0.0;
+        if (!tipInput.isEmpty()) {
+            try {
+                tip = Double.parseDouble(tipInput);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid tip. Using 0.");
+                tip = 0.0;
+            }
+        }
+
+        double finalTotal = orderService.getTotalWithTaxAndTip(tip);
+
+        System.out.println("Tip: $" + String.format("%.2f", tip));
+        System.out.println("FINAL TOTAL: $" + String.format("%.2f", finalTotal));
 
         System.out.print("Do you want to save this order to file? (y/n): ");
         String input = scanner.nextLine().trim().toLowerCase();
