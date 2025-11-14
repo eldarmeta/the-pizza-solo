@@ -31,9 +31,16 @@ public class Pizza {
         toppings.add(topping);
     }
 
-    public boolean removeTopping(String toppingName) {
-        return toppings.removeIf(t -> t.getName().equalsIgnoreCase(toppingName));
+    public boolean removeTopping(String name) {
+        for (Topping t : toppings) {
+            if (t.getName().equalsIgnoreCase(name)) {
+                toppings.remove(t);
+                return true;
+            }
+        }
+        return false;
     }
+
 
     public double calculatePrice() {
         double basePrice = switch (size.toLowerCase()) {
@@ -49,6 +56,8 @@ public class Pizza {
 
         return basePrice + toppingsTotal;
     }
+
+
 
     @Override
     public String toString() {
