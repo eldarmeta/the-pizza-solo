@@ -1,11 +1,9 @@
-package com.pizza;
+package com.pizza.ui;
 
-import com.pizza.ui.Menu;
-
-public class Main {
+public class ConsoleUI {
     public static void main(String[] args) {
         Menu menu = new Menu();
-        menu.run();
+        menu.start();
 
     }
 }
