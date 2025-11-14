@@ -1,234 +1,259 @@
 package com.pizza.ui;
 
-import com.pizza.model.Order;
-import com.pizza.model.Pizza;
-import com.pizza.model.Topping;
-import com.pizza.model.Drink;
-import com.pizza.model.SideItem;
-import com.pizza.io.OrderPrinter;
 import com.pizza.io.OrderFileWriter;
+import com.pizza.io.OrderPrinter;
+import com.pizza.io.ReceiptWriter;
+import com.pizza.model.Drink;
+import com.pizza.model.Pizza;
+import com.pizza.model.SideItem;
+import com.pizza.model.Topping;
+import com.pizza.service.DrinkService;
+import com.pizza.service.OrderService;
+import com.pizza.service.PizzaService;
+import com.pizza.service.SideItemService;
+import com.pizza.service.ToppingService;
+import com.pizza.util.InputValidator;
 
 import java.util.Scanner;
 
 public class Menu {
-    private Scanner scanner = new Scanner(System.in);
-    private Order order = new Order();
-    private Pizza pizza;
-    private OrderPrinter printer = new OrderPrinter();
-    private OrderFileWriter fileWriter = new OrderFileWriter();
 
-    private final Topping[] AVAILABLE_TOPPINGS = {
-            new Topping("Cheese", 1.00),
-            new Topping("Pepperoni", 1.50),
-            new Topping("Mushrooms", 0.75),
-            new Topping("Onions", 0.50),
-            new Topping("Sausage", 1.75)
-    };
+    private final Scanner scanner = new Scanner(System.in);
 
-    private final Drink[] AVAILABLE_DRINKS = {
-            new Drink("Coke", 2.00),
-            new Drink("Sprite", 2.00),
-            new Drink("Water", 1.00)
-    };
+    private final OrderService orderService = new OrderService();
+    private final PizzaService pizzaService = new PizzaService();
+    private final ToppingService toppingService = new ToppingService();
+    private final DrinkService drinkService = new DrinkService();
+    private final SideItemService sideItemService = new SideItemService();
 
-    private final SideItem[] AVAILABLE_SIDES = {
-            new SideItem("Garlic Knots", 3.50),
-            new SideItem("Breadsticks", 3.00)
-    };
+    private final ReceiptWriter consoleWriter = new OrderPrinter();
+    private final ReceiptWriter fileWriter = new OrderFileWriter();
 
-    public void run() {
-        System.out.println("=== Welcome to The Pizza App ===");
+    private Pizza currentPizza;
 
-        while (true) {
-            printMenu();
-            int choice = getChoice();
+    public void start() {
+        boolean running = true;
+
+        while (running) {
+            printMainMenu();
+            String input = scanner.nextLine();
+            int choice = InputValidator.parseIntOrMinusOne(input);
 
             switch (choice) {
-                case 1 -> createPizza();
-                case 2 -> addTopping();
-                case 3 -> removeTopping();
-                case 4 -> showPizza();
-                case 5 -> savePizzaToOrder();
-                case 6 -> showOrder();
-                case 7 -> saveOrderToFile();
-                case 8 -> addDrinkToOrder();
-                case 9 -> addSideToOrder();
+                case 1 -> createNewPizza();
+                case 2 -> addDrink();
+                case 3 -> addSideItem();
+                case 4 -> showCurrentOrder();
+                case 5 -> saveOrderToFile();
+                case 6 -> finalizeOrderAndStartNew();
                 case 0 -> {
-                    System.out.println("Exiting...");
-                    return;
+                    System.out.println("Exiting application. Goodbye!");
+                    running = false;
                 }
-                default -> System.out.println("Invalid option, please try again.");
+                default -> System.out.println("Invalid option. Please try again.");
             }
         }
     }
 
-    private void printMenu() {
-        System.out.println("\n1. Create new pizza");
-        System.out.println("2. Add topping to current pizza");
-        System.out.println("3. Remove topping from current pizza");
-        System.out.println("4. Show current pizza");
-        System.out.println("5. Save pizza to order");
-        System.out.println("6. Show full order");
-        System.out.println("7. Save order to file");
-        System.out.println("8. Add drink to order");
-        System.out.println("9. Add side item to order");
+    private void printMainMenu() {
+        System.out.println();
+        System.out.println("=== PIZZA ORDERING SYSTEM ===");
+        System.out.println("1. Create / Edit Pizza");
+        System.out.println("2. Add Drink");
+        System.out.println("3. Add Side Item");
+        System.out.println("4. Show Current Order");
+        System.out.println("5. Save Order to File");
+        System.out.println("6. Finalize Order and Start New");
         System.out.println("0. Exit");
         System.out.print("Choose an option: ");
     }
 
-    private int getChoice() {
-        try {
-            return Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            return -1;
-        }
-    }
+    private void createNewPizza() {
+        System.out.println();
+        System.out.println("=== CREATE / EDIT PIZZA ===");
 
-    private void createPizza() {
         String size;
-
         while (true) {
-            System.out.print("Enter pizza size (Small/Medium/Large): ");
-            String input = scanner.nextLine().trim().toLowerCase();
+            System.out.print("Enter pizza size (Small/Medium/Large or S/M/L): ");
+            String input = scanner.nextLine();
+            String normalized = InputValidator.normalizeSize(input);
 
-            if (input.equals("small") || input.equals("s")) {
-                size = "Small";
-                break;
-            } else if (input.equals("medium") || input.equals("m")) {
-                size = "Medium";
-                break;
-            } else if (input.equals("large") || input.equals("l")) {
-                size = "Large";
-                break;
-            } else {
+            if (normalized == null) {
                 System.out.println("Invalid size. Please enter Small, Medium, or Large (or S/M/L).");
+            } else {
+                size = normalized;
+                break;
             }
         }
 
-        pizza = new Pizza(size);
+        currentPizza = pizzaService.createPizza(size);
         System.out.println("Created a new pizza of size: " + size);
-    }
 
-    private void addTopping() {
-        if (pizza == null) {
-            System.out.println("Please create a pizza first.");
-            return;
-        }
+        boolean editingToppings = true;
+        while (editingToppings) {
+            System.out.println();
+            System.out.println("1. Add Topping");
+            System.out.println("2. Remove Topping");
+            System.out.println("3. Finish Pizza");
+            System.out.print("Choose an option: ");
 
-        System.out.println("Available toppings:");
-        for (int i = 0; i < AVAILABLE_TOPPINGS.length; i++) {
-            Topping t = AVAILABLE_TOPPINGS[i];
-            System.out.println((i + 1) + ". " + t.getName() + " ($" + String.format("%.2f", t.getPrice()) + ")");
-        }
-        System.out.print("Choose topping number: ");
+            String input = scanner.nextLine();
+            int choice = InputValidator.parseIntOrMinusOne(input);
 
-        try {
-            int choice = Integer.parseInt(scanner.nextLine());
-            if (choice < 1 || choice > AVAILABLE_TOPPINGS.length) {
-                System.out.println("Invalid topping choice.");
-                return;
+            switch (choice) {
+                case 1 -> addToppingToCurrentPizza();
+                case 2 -> removeToppingFromCurrentPizza();
+                case 3 -> {
+                    if (currentPizza != null) {
+                        orderService.addPizza(currentPizza);
+                        System.out.println("Pizza added to order.");
+                        currentPizza = null;
+                    } else {
+                        System.out.println("No pizza to add.");
+                    }
+                    editingToppings = false;
+                }
+                default -> System.out.println("Invalid option. Please try again.");
             }
-            Topping base = AVAILABLE_TOPPINGS[choice - 1];
-            Topping topping = new Topping(base.getName(), base.getPrice());
-            pizza.addTopping(topping);
-            System.out.println("Added topping: " + topping.getName());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input.");
         }
     }
 
-    private void removeTopping() {
-        if (pizza == null || pizza.getToppings().isEmpty()) {
-            System.out.println("No pizza or toppings found.");
+    private void addToppingToCurrentPizza() {
+        if (currentPizza == null) {
+            System.out.println("No active pizza. Please create a pizza first.");
             return;
         }
-        System.out.print("Enter topping name to remove: ");
-        String name = scanner.nextLine();
-        boolean removed = pizza.getToppings().removeIf(t -> t.getName().equalsIgnoreCase(name));
+
+        System.out.println();
+        toppingService.printToppingsMenu();
+        System.out.print("Choose topping number (or 0 to cancel): ");
+        String input = scanner.nextLine();
+        int choice = InputValidator.parseIntOrMinusOne(input);
+
+        if (choice == 0) {
+            System.out.println("Cancelled topping selection.");
+            return;
+        }
+
+        Topping selected = toppingService.getToppingByIndex(choice - 1);
+        if (selected == null) {
+            System.out.println("Invalid topping number.");
+        } else {
+            pizzaService.addTopping(currentPizza, selected);
+            System.out.println("Added topping: " + selected.getName());
+        }
+    }
+
+    private void removeToppingFromCurrentPizza() {
+        if (currentPizza == null) {
+            System.out.println("No active pizza. Please create a pizza first.");
+            return;
+        }
+
+        if (currentPizza.getToppings().isEmpty()) {
+            System.out.println("This pizza has no toppings.");
+            return;
+        }
+
+        System.out.println("Current toppings:");
+        for (int i = 0; i < currentPizza.getToppings().size(); i++) {
+            Topping t = currentPizza.getToppings().get(i);
+            System.out.println((i + 1) + ". " + t.getName());
+        }
+
+        System.out.print("Enter topping name to remove (or leave empty to cancel): ");
+        String name = scanner.nextLine().trim();
+        if (name.isEmpty()) {
+            System.out.println("Cancelled.");
+            return;
+        }
+
+        boolean removed = pizzaService.removeToppingByName(currentPizza, name);
         if (removed) {
             System.out.println("Removed topping: " + name);
         } else {
-            System.out.println("Topping not found.");
+            System.out.println("Topping not found: " + name);
         }
     }
 
-    private void showPizza() {
-        if (pizza == null) {
-            System.out.println("No pizza created yet.");
+    private void addDrink() {
+        System.out.println();
+        drinkService.printDrinkMenu();
+        System.out.print("Choose drink number (or 0 to cancel): ");
+        String input = scanner.nextLine();
+        int choice = InputValidator.parseIntOrMinusOne(input);
+
+        if (choice == 0) {
+            System.out.println("Cancelled drink selection.");
+            return;
+        }
+
+        Drink drink = drinkService.getDrinkByIndex(choice - 1);
+        if (drink == null) {
+            System.out.println("Invalid drink number.");
         } else {
-            pizza.printInfo();
+            orderService.addDrink(drink);
+            System.out.println("Added drink: " + drink.getName());
         }
     }
 
-    private void savePizzaToOrder() {
-        if (pizza == null) {
-            System.out.println("No pizza to save.");
+    private void addSideItem() {
+        System.out.println();
+        sideItemService.printSidesMenu();
+        System.out.print("Choose side item number (or 0 to cancel): ");
+        String input = scanner.nextLine();
+        int choice = InputValidator.parseIntOrMinusOne(input);
+
+        if (choice == 0) {
+            System.out.println("Cancelled side item selection.");
+            return;
+        }
+
+        SideItem sideItem = sideItemService.getSideByIndex(choice - 1);
+        if (sideItem == null) {
+            System.out.println("Invalid side item number.");
         } else {
-            order.addPizza(pizza);
-            System.out.println("Pizza added to order.");
-            pizza = null;
+            orderService.addSideItem(sideItem);
+            System.out.println("Added side item: " + sideItem.getName());
         }
     }
 
-    private void showOrder() {
-        if (order.getPizzas().isEmpty() && order.getDrinks().isEmpty() && order.getSides().isEmpty()) {
-            System.out.println("No items in order.");
-        } else {
-            printer.printToConsole(order);
+    private void showCurrentOrder() {
+        System.out.println();
+        if (!orderService.hasItems()) {
+            System.out.println("Current order is empty.");
+            return;
         }
+        consoleWriter.write(orderService.getCurrentOrder());
     }
 
     private void saveOrderToFile() {
-        if (order.getPizzas().isEmpty() && order.getDrinks().isEmpty() && order.getSides().isEmpty()) {
-            System.out.println("No items to save.");
-        } else {
-            fileWriter.writeToFile(order);
+        System.out.println();
+        if (!orderService.hasItems()) {
+            System.out.println("No items in order to save.");
+            return;
         }
+        fileWriter.write(orderService.getCurrentOrder());
     }
 
-    private void addDrinkToOrder() {
-        System.out.println("Available drinks:");
-        for (int i = 0; i < AVAILABLE_DRINKS.length; i++) {
-            Drink d = AVAILABLE_DRINKS[i];
-            System.out.println((i + 1) + ". " + d.getName() + " ($" + String.format("%.2f", d.getPrice()) + ")");
+    private void finalizeOrderAndStartNew() {
+        System.out.println();
+        if (!orderService.hasItems()) {
+            System.out.println("Order is empty. Nothing to finalize.");
+            return;
         }
-        System.out.print("Choose drink number: ");
 
-        try {
-            int choice = Integer.parseInt(scanner.nextLine());
-            if (choice < 1 || choice > AVAILABLE_DRINKS.length) {
-                System.out.println("Invalid drink choice.");
-                return;
-            }
-            Drink base = AVAILABLE_DRINKS[choice - 1];
-            Drink drink = new Drink(base.getName(), base.getPrice());
-            order.addDrink(drink);
-            System.out.println("Added drink: " + drink.getName());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input.");
-        }
-    }
+        System.out.println("Final order:");
+        consoleWriter.write(orderService.getCurrentOrder());
 
-    private void addSideToOrder() {
-        System.out.println("Available sides:");
-        for (int i = 0; i < AVAILABLE_SIDES.length; i++) {
-            SideItem s = AVAILABLE_SIDES[i];
-            System.out.println((i + 1) + ". " + s.getName() + " ($" + String.format("%.2f", s.getPrice()) + ")");
+        System.out.print("Do you want to save this order to file? (y/n): ");
+        String input = scanner.nextLine().trim().toLowerCase();
+        if (input.equals("y") || input.equals("yes")) {
+            fileWriter.write(orderService.getCurrentOrder());
         }
-        System.out.print("Choose side number: ");
 
-        try {
-            int choice = Integer.parseInt(scanner.nextLine());
-            if (choice < 1 || choice > AVAILABLE_SIDES.length) {
-                System.out.println("Invalid side choice.");
-                return;
-            }
-            SideItem base = AVAILABLE_SIDES[choice - 1];
-            SideItem sideItem = new SideItem(base.getName(), base.getPrice());
-            order.addSideItem(sideItem);
-            System.out.println("Added side item: " + sideItem.getName());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input.");
-        }
+        orderService.startNewOrder();
+        currentPizza = null;
+        System.out.println("Started a new order.");
     }
 }
